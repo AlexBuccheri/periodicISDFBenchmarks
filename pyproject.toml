@@ -1,0 +1,49 @@
+[project]
+name = "periodic-isdf-benchmark"
+version = "0.0.1"
+description = "Benchmark helpers for periodic ISDF experiments."
+authors = [{ name = "Alex Buccheri" }]
+requires-python = ">=3.10"
+dependencies = [
+  "jupyter",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "postopus",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=7.2.0",
+  "pytest-cov>=4.0.0",
+  "ruff>=0.1.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+postopus = { path = "../libraries/postopus", editable = true }
+
+[tool.ruff]
+src = ["jupyter"]
+
+[tool.ruff.lint]
+ignore = [
+  "E501",  # line too long
+  "E731",  # allow named lambdas
+]
+
+[tool.coverage.run]
+branch = true
+relative_files = true
+source = ["jupyter"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v --doctest-modules"
+testpaths = ["tests"]
