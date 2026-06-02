@@ -1,4 +1,6 @@
 """ Benchmark q-independent ISDF
+
+ python qindependent/generate_inputs.py
 """
 from __future__ import annotations
 

@@ -5,8 +5,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import numpy as np
-
 
 # Returns numpy array, which cannot be serialised
 # def parse_exchange_energy(file: Path | str):
