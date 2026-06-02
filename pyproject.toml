@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "periodic-isdf-benchmark"
 version = "0.0.1"
@@ -17,16 +21,20 @@ dev = [
   "pytest>=7.2.0",
   "pytest-cov>=4.0.0",
   "ruff>=0.1.8",
+  "numpy>=2.0.0"
 ]
 
 [tool.uv]
-package = false
+package = true
 
 [tool.uv.sources]
 postopus = { path = "../libraries/postopus", editable = true }
 
+[tool.setuptools.packages.find]
+include = ["periodic_isdf_benchmarks*", "qindependent*"]
+
 [tool.ruff]
-src = ["jupyter"]
+src = ["jupyter", "periodic_isdf_benchmarks", "qindependent"]
 
 [tool.ruff.lint]
 ignore = [
@@ -37,7 +45,7 @@ ignore = [
 [tool.coverage.run]
 branch = true
 relative_files = true
-source = ["jupyter"]
+source = ["jupyter", "periodic_isdf_benchmarks", "qindependent"]
 
 [tool.coverage.report]
 show_missing = true
