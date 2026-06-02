@@ -8,7 +8,7 @@ from typing import List
 
 module_25c = """module purge
 mpsd-modules 25c
-module load gcc/13.2.0 openmpi/4.1.6 octopus-dependencies/full
+module load gcc/14.3.0 openmpi/4.1.7 octopus-dependencies/full
 unset CPATH 
 unset LIBRARY_PATH
 """
@@ -45,6 +45,7 @@ class SlurmConfig:
 
     def __str__(self) -> str:
         """
+        $SLURM_NTASKS = n_nodes * ntasks-per-node == total number of MPI processes
         :return:
         """
         string = """#!/bin/bash
@@ -53,17 +54,18 @@ class SlurmConfig:
         string += "\n".join(self.to_sbatch_directives())
         string += f"""\n
 {self.pre_script}
-EXE={self.executable}
-OUT={self.stdout}
-        
-# Work in the submission directory
-cd ${{SLURM_SUBMIT_DIR}}
 
 # Set OMP_NUM_THREADS to the number cpu cores per MPI task
 export OMP_NUM_THREADS=${{SLURM_CPUS_PER_TASK}}
+export OPENBLAS_NUM_THREADS=${{SLURM_CPUS_PER_TASK}}
 
-# $SLURM_NTASKS = n_nodes * ntasks-per-node == total number of MPI processes
-orterun -np $SLURM_NTASKS $EXE > $OUT
+# Work in the submission directory
+cd ${{SLURM_SUBMIT_DIR}}
+srun -n $SLURM_NTASKS {self.executable} > {self.stdout}
+
+# Parse relevant outputs
+PARSE_ROOT=/home/bucchera/periodic_isdf/periodicISDFBenchmarks
+$PARSE_ROOT/.venv/bin/python3 $PARSE_ROOT/qindependent/parse_result.py ${{SLURM_SUBMIT_DIR}}       
         """
         return string
 
