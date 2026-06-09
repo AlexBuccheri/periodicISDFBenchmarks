@@ -22,8 +22,12 @@ def parse_exchange_results(dir: Path | str):
 
     # Relevant inputs
     inp: dict = parse_octopus_input(dir / "inp")
-    results["inp"] = {"ISDFNpoints": inp["ISDFNpoints"],
-                      "KPointsGrid": inp["KPointsGrid"][0]}
+
+    results["inp"] = {"KPointsGrid": inp["KPointsGrid"][0]}
+
+    # Key will not be present for ACE reference
+    if "ISDFNpoints" in inp:
+        results["inp"]["ISDFNpoints"] = inp["ISDFNpoints"]
 
     # Exact exchange energy, hacked to print to stdout
     results['exchange_energy'] = parse_exchange_energy(dir / "terminal.out")
@@ -48,6 +52,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", type=Path, default=Path("results.json"))
     args = parser.parse_args()
 
+    print(f"Parsing output from: {args.run_dir}")
     results = parse_exchange_results(args.run_dir)
 
     with open("results.json", "w", encoding="utf-8") as f:

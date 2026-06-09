@@ -1,6 +1,16 @@
 """ Benchmark q-independent ISDF
 
+# Run:
  python qindependent/generate_inputs.py
+
+ # Copy to remote
+scp -r outputs/* bucchera@mpsd-hpc-login1.desy.de:/home/bucchera/periodic_isdf/silicon_qindp/
+
+# From job folder, submit all jobs:
+for d in KPointsGrid*/; do
+    [ -f "$d/slurm.sh" ] || { echo "Skipping $d: no slurm.sh"; continue; }
+    ( cd "$d" && sbatch slurm.sh )
+done
 """
 from __future__ import annotations
 
@@ -74,8 +84,8 @@ if __name__ == "__main__":
     # Want specific numbers of ISDF points with each k-grid
     options = [{"KPointsGrid": [[1, 1, 1]], "ISDFNpoints": [30, 40, 50, 60]},
                {"KPointsGrid": [[2, 2, 2]], "ISDFNpoints": [30, 40, 50, 60, 70, 80]},
-               {"KPointsGrid": [[3, 3, 3]], "ISDFNpoints": [60, 80, 100]},
-               {"KPointsGrid": [[4, 4, 4]], "ISDFNpoints": [80, 100, 120]}]
+               {"KPointsGrid": [[3, 3, 3]], "ISDFNpoints": [60, 80, 100, 120]},
+               {"KPointsGrid": [[4, 4, 4]], "ISDFNpoints": [80, 100, 120, 140]}]
                # {"KPointsGrid": [[6, 6, 6]], "ISDFNpoints": [100, 150, 200]}
                # ]
     all_options = []
@@ -84,7 +94,6 @@ if __name__ == "__main__":
 
     # Base slurm config
     slurm = SlurmConfig(executable = "/home/bucchera/periodic_isdf/octopus/isdf_build/octopus",
-                    job_name = "name",
                     partition="bigmem",
                     nodes=1,
                     ntasks_per_node=1,
@@ -142,7 +151,7 @@ if __name__ == "__main__":
 
         # Slurm script
         # Modify according to problem size
-        slurm.ntasks_per_node = np.prod(opt["KPointsGrid"])
+        slurm.ntasks_per_node = int(np.prod(opt["KPointsGrid"]))
         slurm.job_name = job_name
 
         with open(file=job_dir / Path("slurm.sh"), mode="w") as fid:
